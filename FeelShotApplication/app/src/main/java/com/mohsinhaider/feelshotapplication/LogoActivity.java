@@ -183,6 +183,7 @@ public class LogoActivity extends AppCompatActivity implements GoogleApiClient.O
 
         private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
             Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+            Log.d(TAG, "firebaseAuthID:" + acct.getEmail());
 
             AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
             mAuth.signInWithCredential(credential)
