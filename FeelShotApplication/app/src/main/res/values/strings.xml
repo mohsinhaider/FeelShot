@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Log In</string>
+    <string name="web_client_id">527626849767-rdmvgvsu0g8m4fen602rjupl5c7to812.apps.googleusercontent.com</string>
+    <string name="signed_in_fmt">Signed in as: %s</string>
+    <string name="title_activity_google_sign_in">GoogleSignInActivity</string>
+    <string name="title_activity_image">ImageActivity</string>
+</resources>
