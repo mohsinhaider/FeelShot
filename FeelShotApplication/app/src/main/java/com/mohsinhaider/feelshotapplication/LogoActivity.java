@@ -28,6 +28,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LogoActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
@@ -41,6 +46,8 @@ public class LogoActivity extends AppCompatActivity implements GoogleApiClient.O
 
         private FirebaseAuth.AuthStateListener mAuthListener;
 
+        private DatabaseReference mReference;
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -53,6 +60,10 @@ public class LogoActivity extends AppCompatActivity implements GoogleApiClient.O
                         .setCancelable(false)
                         .show();
             }
+
+
+            // References ... what to put for the sub-child !??!!?
+            mReference = FirebaseDatabase.getInstance().getReference();
 
             findViewById(R.id.sign_in_button).setOnClickListener(this);
 
@@ -185,6 +196,13 @@ public class LogoActivity extends AppCompatActivity implements GoogleApiClient.O
             Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
             Log.d(TAG, "firebaseAuthID:" + acct.getEmail());
 
+            checkIfNew(acct);
+
+            // reference a branch on firebase and if that node exists the user is there...
+            // if not
+
+
+
             AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
             mAuth.signInWithCredential(credential)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -222,6 +240,43 @@ public class LogoActivity extends AppCompatActivity implements GoogleApiClient.O
 //            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
             }
         }
+
+    private boolean userExists;
+
+    public void checkIfNew(GoogleSignInAccount myAcct) {
+        String userID = myAcct.getId();
+//        String path = "https://feelshotapplication.firebaseio.com/users/" + userID;
+        String path = "users/" + userID;
+
+        ValueEventListener userListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+               // String id = dataSnapshot.getValue(String.class);
+                userExists = dataSnapshot.exists();
+                //Log.d("SNAPSHOT_STATUS", id);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                // ...
+            }
+        };
+        mReference.child(path).addValueEventListener(userListener);
+
+        if(userExists) {
+            // start the calendar intent
+            Log.d("WOOO", "user exists");
+            //mReference.child("users").child(userID).child("username").setValue(myAcct.getDisplayName());
+        }
+        else {
+            // start thr registration intent
+            Log.d("NOOO", "user DOESNT exists");
+            mReference.child("users").child(userID).child("username").setValue(myAcct.getDisplayName());
+        }
+    }
 
 
 
