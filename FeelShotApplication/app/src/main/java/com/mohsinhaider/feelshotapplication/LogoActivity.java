@@ -233,6 +233,7 @@ public class LogoActivity extends AppCompatActivity implements GoogleApiClient.O
 //            findViewById(R.id.sign_in_button).setVisibility(View.GONE);
 //            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
             } else {
+                view.setText("");
 //            mStatusTextView.setText(R.string.signed_out);
 //            mDetailTextView.setText(null);
 //
@@ -270,6 +271,11 @@ public class LogoActivity extends AppCompatActivity implements GoogleApiClient.O
             // start the calendar intent
             Log.d("WOOO", "user exists");
             //mReference.child("users").child(userID).child("username").setValue(myAcct.getDisplayName());
+            Intent calendarIntent = new Intent(this, CalendarActivity.class);
+//            Bundle myBundle = new Bundle();
+//            myBundle.pu
+//            calendarIntent.putExtras()
+            startActivity(calendarIntent);
         }
         else {
             // start thr registration intent

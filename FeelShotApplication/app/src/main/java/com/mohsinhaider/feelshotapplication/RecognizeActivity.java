@@ -1,9 +1,5 @@
 package com.mohsinhaider.feelshotapplication;
 
-/**
- * Created by mohsin on 11/5/16.
- */
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -15,13 +11,19 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.gson.Gson;
 import com.microsoft.projectoxford.emotion.EmotionServiceClient;
 import com.microsoft.projectoxford.emotion.EmotionServiceRestClient;
@@ -38,59 +40,32 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+
 public class RecognizeActivity extends ActionBarActivity {
 
-    // Flag to indicate which task is to be performed.
     private static final int REQUEST_SELECT_IMAGE = 0;
-
-    // The button to select an image
     private Button mButtonSelectImage;
-
-    // The URI of the image selected to detect.
     private Uri mImageUri;
-
-    // The image selected to detect.
     private Bitmap mBitmap;
-
-    // The edit to show status and result.
-    private EditText mEditText;
-
     private EmotionServiceClient client;
+
+    private static final int RC_SIGN_IN = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recognize);
+        
 
         if (client == null) {
             client = new EmotionServiceRestClient(getString(R.string.subscription_key));
         }
 
         mButtonSelectImage = (Button) findViewById(R.id.buttonSelectImage);
-        mEditText = (EditText) findViewById(R.id.editTextResult);
+        //mEditText = (EditText) findViewById(R.id.editTextResult);
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_recognize, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 
     public void doRecognize() {
         mButtonSelectImage.setEnabled(false);
@@ -99,25 +74,25 @@ public class RecognizeActivity extends ActionBarActivity {
         try {
             new doRequest(false).execute();
         } catch (Exception e) {
-            mEditText.append("Error encountered. Exception is: " + e.toString());
+            //mEditText.append("Error encountered. Exception is: " + e.toString());
         }
 
         String faceSubscriptionKey = getString(R.string.faceSubscription_key);
         if (faceSubscriptionKey.equalsIgnoreCase("Please_add_the_face_subscription_key_here")) {
-            mEditText.append("\n\nThere is no face subscription key in res/values/strings.xml. Skip the sample for detecting emotions using face rectangles\n");
+            //mEditText.append("\n\nThere is no face subscription key in res/values/strings.xml. Skip the sample for detecting emotions using face rectangles\n");
         } else {
             // Do emotion detection using face rectangles provided by Face API.
             try {
                 new doRequest(true).execute();
             } catch (Exception e) {
-                mEditText.append("Error encountered. Exception is: " + e.toString());
+                //mEditText.append("Error encountered. Exception is: " + e.toString());
             }
         }
     }
 
     // Called when the "Select Image" button is clicked.
     public void selectImage(View view) {
-        mEditText.setText("");
+        //mEditText.setText("");
 
         Intent intent;
         intent = new Intent(RecognizeActivity.this, com.mohsinhaider.feelshotapplication.helper.SelectImageActivity.class);
@@ -267,16 +242,16 @@ public class RecognizeActivity extends ActionBarActivity {
             // Display based on error existence
 
             if (this.useFaceRectangles == false) {
-                mEditText.append("\n\nRecognizing emotions with auto-detected face rectangles...\n");
+                //mEditText.append("\n\nRecognizing emotions with auto-detected face rectangles...\n");
             } else {
-                mEditText.append("\n\nRecognizing emotions with existing face rectangles from Face API...\n");
+                //mEditText.append("\n\nRecognizing emotions with existing face rectangles from Face API...\n");
             }
             if (e != null) {
-                mEditText.setText("Error: " + e.getMessage());
+                //mEditText.setText("Error: " + e.getMessage());
                 this.e = null;
             } else {
                 if (result.size() == 0) {
-                    mEditText.append("No emotion detected :(");
+                    //mEditText.append("No emotion detected :(");
                 } else {
                     Integer count = 0;
                     // Covert bitmap to a mutable bitmap by copying it
@@ -289,30 +264,63 @@ public class RecognizeActivity extends ActionBarActivity {
                     paint.setColor(Color.RED);
 
                     for (RecognizeResult r : result) {
-                        mEditText.append(String.format("\nFace #%1$d \n", count));
-                        mEditText.append(String.format("\t anger: %1$.5f\n", r.scores.anger));
-                        mEditText.append(String.format("\t contempt: %1$.5f\n", r.scores.contempt));
-                        mEditText.append(String.format("\t disgust: %1$.5f\n", r.scores.disgust));
-                        mEditText.append(String.format("\t fear: %1$.5f\n", r.scores.fear));
-                        mEditText.append(String.format("\t happiness: %1$.5f\n", r.scores.happiness));
-                        mEditText.append(String.format("\t neutral: %1$.5f\n", r.scores.neutral));
-                        mEditText.append(String.format("\t sadness: %1$.5f\n", r.scores.sadness));
-                        mEditText.append(String.format("\t surprise: %1$.5f\n", r.scores.surprise));
-                        mEditText.append(String.format("\t face rectangle: %d, %d, %d, %d", r.faceRectangle.left, r.faceRectangle.top, r.faceRectangle.width, r.faceRectangle.height));
-                        faceCanvas.drawRect(r.faceRectangle.left,
-                                r.faceRectangle.top,
-                                r.faceRectangle.left + r.faceRectangle.width,
-                                r.faceRectangle.top + r.faceRectangle.height,
-                                paint);
-                        count++;
+                        Log.d("Anger", String.format("\t anger: %1$.5f\n", r.scores.anger));
+                        Log.d("Contempt", String.format("\t contempt: %1$.5f\n", r.scores.contempt));
+
+                        TextView angerPercentView = (TextView) findViewById(R.id.textView15);
+                        TextView contemptPercentView = (TextView) findViewById(R.id.textView16);
+                        TextView disgustPercentView = (TextView) findViewById(R.id.textView17);
+                        TextView fearPercentView = (TextView) findViewById(R.id.textView18);
+                        TextView happinessPercentView = (TextView) findViewById(R.id.textView19);
+                        TextView neutralPercentView = (TextView) findViewById(R.id.textView20);
+                        TextView sadnessPercentView = (TextView) findViewById(R.id.textView21);
+                        TextView surprisePercentView = (TextView) findViewById(R.id.textView22);
+
+                        angerPercentView.setText(String.format("%1$.0f", r.scores.anger * 100) + "%");
+                        contemptPercentView.setText(String.format("%1$.0f", r.scores.contempt * 100) + "%");
+                        disgustPercentView.setText(String.format("%1$.0f", r.scores.disgust * 100) + "%");
+                        fearPercentView.setText(String.format("%1$.0f", r.scores.fear * 100) + "%");
+                        happinessPercentView.setText(String.format("%1$.0f", r.scores.happiness * 100) + "%");
+                        neutralPercentView.setText(String.format("%1$.0f", r.scores.neutral * 100) + "%");
+                        sadnessPercentView.setText(String.format("%1$.0f", r.scores.sadness * 100) + "%");
+                        surprisePercentView.setText(String.format("%1$.0f", r.scores.surprise * 100) + "%");
+
+                        ProgressBar angerBar = (ProgressBar) findViewById(R.id.anger_bar);
+                        ProgressBar contemptBar = (ProgressBar) findViewById(R.id.contempt_bar);
+                        ProgressBar disgustBar = (ProgressBar) findViewById(R.id.disgust_bar);
+                        ProgressBar fearBar = (ProgressBar) findViewById(R.id.fear_bar);
+                        ProgressBar happinessBar = (ProgressBar) findViewById(R.id.happiness_bar);
+                        ProgressBar neutralBar = (ProgressBar) findViewById(R.id.neutral_bar);
+                        ProgressBar sadnessBar = (ProgressBar) findViewById(R.id.sadness_bar);
+                        ProgressBar surpriseBar = (ProgressBar) findViewById(R.id.surprise_bar);
+
+                        angerBar.setProgress(Integer.parseInt(String.format("%1$.0f", r.scores.anger * 100)));
+                        contemptBar.setProgress(Integer.parseInt(String.format("%1$.0f", r.scores.contempt * 100)));
+                        disgustBar.setProgress(Integer.parseInt(String.format("%1$.0f", r.scores.disgust * 100)));
+                        fearBar.setProgress(Integer.parseInt(String.format("%1$.0f", r.scores.fear * 100)));
+                        happinessBar.setProgress(Integer.parseInt(String.format("%1$.0f", r.scores.happiness * 100)));
+                        neutralBar.setProgress(Integer.parseInt(String.format("%1$.0f", r.scores.neutral * 100)));
+                        sadnessBar.setProgress(Integer.parseInt(String.format("%1$.0f", r.scores.sadness * 100)));
+                        surpriseBar.setProgress(Integer.parseInt(String.format("%1$.0f", r.scores.surprise * 100)));
+
+//                        mEditText.append(String.format("\nFace #%1$d \n", count));
+//                        mEditText.append(String.format("\t face rectangle: %d, %d, %d, %d", r.faceRectangle.left, r.faceRectangle.top, r.faceRectangle.width, r.faceRectangle.height));
+//                        faceCanvas.drawRect(r.faceRectangle.left,
+//                                r.faceRectangle.top,
+//                                r.faceRectangle.left + r.faceRectangle.width,
+//                                r.faceRectangle.top + r.faceRectangle.height,
+//                                paint);
+//                        count++;
                     }
+
                     ImageView imageView = (ImageView) findViewById(R.id.selectedImage);
                     imageView.setImageDrawable(new BitmapDrawable(getResources(), mBitmap));
                 }
-                mEditText.setSelection(0);
+                //mEditText.setSelection(0);
             }
 
             mButtonSelectImage.setEnabled(true);
         }
     }
 }
+

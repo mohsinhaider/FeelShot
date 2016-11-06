@@ -12,7 +12,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LogoActivity"
+        <activity
+            android:name=".LogoActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,13 +21,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.mohsinhaider.feelshotapplication.RecognizeActivity"
-            android:label="AnalyzeActivity" >
-        </activity>
-
-        <activity android:name="com.mohsinhaider.feelshotapplication.helper.SelectImageActivity"
+        <activity
+            android:name=".RecognizeActivity"
+            android:label="FeelShot PhotoBooth" />
+        <activity
+            android:name=".helper.SelectImageActivity"
             android:label="Select An Image"
             android:screenOrientation="portrait" />
+        <activity android:name=".CalendarActivity"></activity>
     </application>
 
 </manifest>

@@ -22,4 +22,8 @@
     <string name="select_image_in_album">From Gallery</string>
 
     <string name="woo">Force Update</string>
+    <string name="title_activity_calendar_intent">CalendarIntent</string>
+
+    <string name="first_part_logo">The</string>
+    <string name="second_part_logo">Daily</string>
 </resources>
