@@ -71,7 +71,7 @@
 
         <TextView
             android:text="FeelShot Facial-Emotion Recognition"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

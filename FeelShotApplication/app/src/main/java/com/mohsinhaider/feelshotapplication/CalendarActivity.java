@@ -17,10 +17,17 @@ import java.text.SimpleDateFormat;
 
 public class CalendarActivity extends AppCompatActivity {
 
+    private String myUserID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
+
+        Intent myIntent = getIntent();
+        String userID = myIntent.getStringExtra("GoogleID");
+        myUserID = userID;
+
 
         Button feelShotButton = (Button) findViewById(R.id.button2);
         feelShotButton.getBackground().setColorFilter(new LightingColorFilter(0xFFFFFFFF, 0xFFAA0000));
@@ -36,6 +43,7 @@ public class CalendarActivity extends AppCompatActivity {
 
     public void startImageAnalysis(View v) {
         Intent myIntent = new Intent(this, RecognizeActivity.class);
+        myIntent.putExtra("googleID", myUserID);
         startActivity(myIntent);
 
     }

@@ -83,7 +83,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/button2"
         android:textStyle="bold"
-        android:textSize="28sp"
+        android:textSize="24sp"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
         android:id="@+id/textView4" />

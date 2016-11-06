@@ -28,7 +28,9 @@
             android:name=".helper.SelectImageActivity"
             android:label="Select An Image"
             android:screenOrientation="portrait" />
-        <activity android:name=".CalendarActivity"></activity>
+        <activity android:name=".CalendarActivity" />
+        <activity android:name=".TextToSpeechActivity" />
+        <activity android:name=".TextAnalysisActivity"></activity>
     </application>
 
 </manifest>

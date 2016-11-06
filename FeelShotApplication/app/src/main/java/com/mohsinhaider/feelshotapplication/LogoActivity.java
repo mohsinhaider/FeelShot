@@ -246,6 +246,7 @@ public class LogoActivity extends AppCompatActivity implements GoogleApiClient.O
 
     public void checkIfNew(GoogleSignInAccount myAcct) {
         String userID = myAcct.getId();
+
 //        String path = "https://feelshotapplication.firebaseio.com/users/" + userID;
         String path = "users/" + userID;
 
@@ -272,6 +273,7 @@ public class LogoActivity extends AppCompatActivity implements GoogleApiClient.O
             Log.d("WOOO", "user exists");
             //mReference.child("users").child(userID).child("username").setValue(myAcct.getDisplayName());
             Intent calendarIntent = new Intent(this, CalendarActivity.class);
+            calendarIntent.putExtra("GoogleID", userID);
 //            Bundle myBundle = new Bundle();
 //            myBundle.pu
 //            calendarIntent.putExtras()
@@ -281,6 +283,7 @@ public class LogoActivity extends AppCompatActivity implements GoogleApiClient.O
             // start thr registration intent
             Log.d("NOOO", "user DOESNT exists");
             mReference.child("users").child(userID).child("username").setValue(myAcct.getDisplayName());
+            //mReference.child("users").child(userID).child("done-today").setValue(false);
         }
     }
 

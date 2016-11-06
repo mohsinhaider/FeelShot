@@ -24,6 +24,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.microsoft.projectoxford.emotion.EmotionServiceClient;
 import com.microsoft.projectoxford.emotion.EmotionServiceRestClient;
@@ -38,7 +43,13 @@ import com.microsoft.projectoxford.face.contract.Face;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
@@ -49,14 +60,49 @@ public class RecognizeActivity extends ActionBarActivity {
     private Uri mImageUri;
     private Bitmap mBitmap;
     private EmotionServiceClient client;
-
     private static final int RC_SIGN_IN = 9001;
+    private DatabaseReference mDatabase;
+    private String userID;
+    private List<String> singleDay = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recognize);
-        
+
+        Intent myIntentAgain = getIntent();
+        String uID = myIntentAgain.getStringExtra("googleID");
+
+        userID = uID;
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        //mDatabase.child("users").child(userID).child("done-today").getValue("false");
+        // addListenerForSingleValueEvent() <-- how to use here to do ^^^^^ ... and why doesn't that exist? Security? Realtime 'loss'?
+
+        // if ^^ == false
+        //    continue
+        // else
+        //   leave activity
+
+//        mDatabase.child("users").child(userID).child("done-today").addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                boolean doneForToday = (boolean) dataSnapshot.getValue();
+//
+//                if(doneForToday) {
+//                   // Intent myIntent = new Intent()
+//                }
+//                else {
+//                    Log.d("COME", "CONTINUEEE");
+//                    Log.d("COME", "CONTINUEEE");Log.d("COME", "CONTINUEEE");Log.d("COME", "CONTINUEEE");
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
 
         if (client == null) {
             client = new EmotionServiceRestClient(getString(R.string.subscription_key));
@@ -252,6 +298,7 @@ public class RecognizeActivity extends ActionBarActivity {
             } else {
                 if (result.size() == 0) {
                     //mEditText.append("No emotion detected :(");
+
                 } else {
                     Integer count = 0;
                     // Covert bitmap to a mutable bitmap by copying it
@@ -303,6 +350,32 @@ public class RecognizeActivity extends ActionBarActivity {
                         sadnessBar.setProgress(Integer.parseInt(String.format("%1$.0f", r.scores.sadness * 100)));
                         surpriseBar.setProgress(Integer.parseInt(String.format("%1$.0f", r.scores.surprise * 100)));
 
+                        String str1 = String.format("%1$.0f", r.scores.anger * 100);
+                        String str2 = String.format("%1$.0f", r.scores.contempt * 100);
+                        String str3 = String.format("%1$.0f", r.scores.disgust * 100);
+                        String str4 = String.format("%1$.0f", r.scores.fear * 100);
+                        String str5 = String.format("%1$.0f", r.scores.happiness * 100);
+                        String str6 = String.format("%1$.0f", r.scores.neutral * 100);
+                        String str7 = String.format("%1$.0f", r.scores.sadness * 100);
+                        String str8 = String.format("%1$.0f", r.scores.surprise * 100);
+
+                        singleDay.add(str1);
+                        singleDay.add(str2);
+                        singleDay.add(str3);
+                        singleDay.add(str4);
+                        singleDay.add(str5);
+                        singleDay.add(str6);
+                        singleDay.add(str7);
+                        singleDay.add(str8);
+
+//                        singleDay.remove(0);
+//                        singleDay.remove(1);
+//                        singleDay.remove(2);
+//                        singleDay.remove(3);
+
+                        // 8 is "done for today?"
+
+
 //                        mEditText.append(String.format("\nFace #%1$d \n", count));
 //                        mEditText.append(String.format("\t face rectangle: %d, %d, %d, %d", r.faceRectangle.left, r.faceRectangle.top, r.faceRectangle.width, r.faceRectangle.height));
 //                        faceCanvas.drawRect(r.faceRectangle.left,
@@ -320,6 +393,31 @@ public class RecognizeActivity extends ActionBarActivity {
             }
 
             mButtonSelectImage.setEnabled(true);
+
+            DateFormat myFormat = new SimpleDateFormat("MM/dd/yyyy");
+            Date theDate = new Date();
+
+            //HashMap feelMap = new HashMap();
+            //feelMap.put(myFormat.format(theDate), singleDay);
+
+            String validKeyNoSlash = (myFormat.format(theDate)).replace("/", "-");
+            Log.d("VALIDKEY", validKeyNoSlash);
+
+            mDatabase.child("users").child(userID).child("image-analysis").child(validKeyNoSlash).setValue(singleDay);
+            //mDatabase.child("users").child(userID).child("done-today").setValue(true);
+
+            try {
+//                Button buttonToChange = (Button) findViewById(R.id.buttonSelectImage);
+//                buttonToChange.setText("Text Analysis...");
+
+                    Thread.sleep(6000);
+                    Intent myIntent = new Intent(getApplicationContext(), TextToSpeechActivity.class);
+                    startActivity(myIntent);
+            }
+            catch (Exception e) {
+                // nothing
+            }
+
         }
     }
 }
