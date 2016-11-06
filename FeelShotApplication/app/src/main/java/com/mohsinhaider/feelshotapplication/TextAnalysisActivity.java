@@ -38,11 +38,17 @@ public class TextAnalysisActivity extends AppCompatActivity  {
         new RetrieveFeedTask().execute("http://www.google.com");
 
 
-        TextView myView = (TextView) findViewById(R.id.textView11);
-        myView.setText(confidence);
+        try {
+            Thread.sleep(4000);
+            TextView myView = (TextView) findViewById(R.id.textView11);
+            myView.setText(confidence);
 
-        TextView myNewView = (TextView) findViewById(R.id.textView10);
-        myNewView.setText(feelingVal);
+            TextView myNewView = (TextView) findViewById(R.id.textView10);
+            myNewView.setText(feelingVal);
+        }
+        catch (Exception e) {
+
+        }
     }
 
     class RetrieveFeedTask extends AsyncTask<String, URL, HttpURLConnection> {
