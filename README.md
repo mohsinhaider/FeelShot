@@ -11,3 +11,4 @@ FeelShot is a free mobile application that lets anyone track their daily mood an
 - FeelShot also allows a user to record voice input about their daily routine, from which is also analyzed the deciphered text is analyzed. Accessibility is a huge issue, and for the aging population physical problems like tremors alone make it hard to type on a keyboard, which is why we used voice to text.
 - The resultant dataset of emotion analysis (from picture and voice-to-text) spanning over a certain period of time is visualized using an Android-plot library and different kinds of charts and graphs are made available to the counselor or mental health professional for better understanding of the subject's psychological behavior.
 - Firebase is used for authentication of users using Google services (accessibility), and is also used as a database for every user
+"# FeelShot" 
